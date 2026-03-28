@@ -6,7 +6,7 @@ Chemical composition to physical material properties, from first principles.
 [![Docs.rs](https://docs.rs/materia/badge.svg)](https://docs.rs/materia)
 [![CI](https://github.com/walkingtheplanck/materia/actions/workflows/ci.yml/badge.svg)](https://github.com/walkingtheplanck/materia/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/walkingtheplanck/materia/branch/master/graph/badge.svg)](https://codecov.io/gh/walkingtheplanck/materia)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![MSRV](https://img.shields.io/badge/MSRV-1.70-blue.svg)](https://www.rust-lang.org)
 
 ## What it does
@@ -164,9 +164,7 @@ Zero external dependencies. Pure Rust. No `std` features required beyond default
 
 ## License
 
-Licensed under either of:
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
-- MIT License ([LICENSE-MIT](LICENSE-MIT))
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
-at your option.
+For commercial licensing options, contact [hello@walkingtheplanck.com](mailto:hello@walkingtheplanck.com).
 
