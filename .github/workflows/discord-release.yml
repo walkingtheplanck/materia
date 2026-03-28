@@ -1,0 +1,35 @@
+name: Discord Release Notification
+
+on:
+  release:
+    types: [published]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "⚗️ Materia ${{ github.event.release.tag_name }}",
+                "description": "${{ github.event.release.name }}",
+                "url": "${{ github.event.release.html_url }}",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Install",
+                    "value": "```toml\n[dependencies]\nmateria = \"${{ github.event.release.tag_name }}\"\n```",
+                    "inline": false
+                  }
+                ],
+                "footer": {
+                  "text": "crates.io/crates/materia"
+                }
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
