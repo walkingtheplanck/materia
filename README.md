@@ -4,7 +4,10 @@ Chemical composition to physical material properties, from first principles.
 
 [![Crates.io](https://img.shields.io/crates/v/materia.svg)](https://crates.io/crates/materia)
 [![Docs.rs](https://docs.rs/materia/badge.svg)](https://docs.rs/materia)
+[![CI](https://github.com/walkingtheplanck/materia/actions/workflows/ci.yml/badge.svg)](https://github.com/walkingtheplanck/materia/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/walkingtheplanck/materia/branch/master/graph/badge.svg)](https://codecov.io/gh/walkingtheplanck/materia)
 [![License](https://img.shields.io/crates/l/materia.svg)](LICENSE)
+[![MSRV](https://img.shields.io/badge/MSRV-1.70-blue.svg)](https://www.rust-lang.org)
 
 ## What it does
 
