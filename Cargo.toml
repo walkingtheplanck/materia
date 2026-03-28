@@ -1,0 +1,14 @@
+[package]
+name = "materia"
+version = "0.1.0"
+edition = "2021"
+description = "Chemical composition to physical material properties, from first principles."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/walkingtheplanck/materia"
+documentation = "https://docs.rs/materia"
+readme = "README.md"
+keywords = ["chemistry", "materials", "physics", "simulation", "periodic-table"]
+categories = ["science", "simulation"]
+
+[dependencies]
+# Zero external dependencies — pure Rust, fully standalone.
