@@ -27,7 +27,7 @@
 //! (atoms)     (structure)    (physics)     (properties)
 //! ```
 //!
-//! The [`compile`] function derives every property from the chemical
+//! The [`compile()`] function derives every property from the chemical
 //! structure: density from crystallography, melting point from cohesive
 //! energy, conductivity from Wiedemann-Franz, color from electron
 //! structure. No hardcoded material databases.
@@ -39,10 +39,10 @@
 //! - [`molecular`] — [`Molecule`], [`Bond`], bond energies
 //! - [`crystal`] — [`Crystal`], [`LatticeType`] (BCC, FCC, HCP, Diamond)
 //! - [`polymer`] — [`PolymerChain`] with cross-linking
-//! - [`compile`] — [`compile()`] and [`compile_as()`]: substance → material properties
+//! - [`mod@compile`] — [`compile()`] and [`compile_as()`]: substance → material properties
 //! - [`material`] — [`MaterialDef`] output type with all property groups
 //! - [`reaction`] — Chemical [`Reaction`] with energy balance
-//! - [`interaction`] — [`InteractionRule`] for runtime reaction dispatch
+//! - [`interaction`] — `InteractionRule` for runtime reaction dispatch
 //! - [`presets`] — 20 ready-to-use world materials
 
 pub mod compile;
