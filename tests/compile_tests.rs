@@ -1,6 +1,6 @@
-use materia::*;
 use materia::crystal::LatticeType;
 use materia::material::PhaseState;
+use materia::*;
 
 #[test]
 fn compile_water() {
@@ -76,19 +76,31 @@ fn compile_diamond() {
 #[test]
 fn combustion_methane_exothermic() {
     let r = Reaction::combustion_methane();
-    assert!(r.is_exothermic(), "Methane combustion should be exothermic (got {:.1} kJ/mol)", r.energy());
+    assert!(
+        r.is_exothermic(),
+        "Methane combustion should be exothermic (got {:.1} kJ/mol)",
+        r.energy()
+    );
 }
 
 #[test]
 fn combustion_hydrogen_exothermic() {
     let r = Reaction::combustion_hydrogen();
-    assert!(r.is_exothermic(), "Hydrogen combustion should be exothermic (got {:.1})", r.energy());
+    assert!(
+        r.is_exothermic(),
+        "Hydrogen combustion should be exothermic (got {:.1})",
+        r.energy()
+    );
 }
 
 #[test]
 fn combustion_carbon_exothermic() {
     let r = Reaction::combustion_carbon();
-    assert!(r.is_exothermic(), "Carbon combustion should be exothermic (got {:.1})", r.energy());
+    assert!(
+        r.is_exothermic(),
+        "Carbon combustion should be exothermic (got {:.1})",
+        r.energy()
+    );
 }
 
 #[test]
@@ -104,7 +116,11 @@ fn rusting_energy() {
 fn water_electrolysis_endothermic() {
     let r = Reaction::water_electrolysis();
     // Electrolysis is the reverse of combustion — should need energy input
-    assert!(!r.is_exothermic(), "Electrolysis should be endothermic (got {:.1})", r.energy());
+    assert!(
+        !r.is_exothermic(),
+        "Electrolysis should be endothermic (got {:.1})",
+        r.energy()
+    );
 }
 
 #[test]
@@ -118,13 +134,21 @@ fn copper_oxidation_energy() {
 fn fermentation_exothermic() {
     let r = Reaction::fermentation();
     // Fermentation releases a small amount of energy
-    assert!(r.is_exothermic(), "Fermentation should be exothermic (got {:.1})", r.energy());
+    assert!(
+        r.is_exothermic(),
+        "Fermentation should be exothermic (got {:.1})",
+        r.energy()
+    );
 }
 
 #[test]
 fn sugar_combustion_exothermic() {
     let r = Reaction::sugar_combustion();
-    assert!(r.is_exothermic(), "Sugar combustion should be exothermic (got {:.1})", r.energy());
+    assert!(
+        r.is_exothermic(),
+        "Sugar combustion should be exothermic (got {:.1})",
+        r.energy()
+    );
 }
 
 #[test]

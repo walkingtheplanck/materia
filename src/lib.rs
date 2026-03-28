@@ -45,27 +45,27 @@
 //! - [`interaction`] — [`InteractionRule`] for runtime reaction dispatch
 //! - [`presets`] — 20 ready-to-use world materials
 
-pub mod element;
-pub mod substance;
-pub mod molecular;
-pub mod crystal;
-pub mod polymer;
 pub mod compile;
-pub mod material;
+pub mod crystal;
+pub mod element;
 pub mod interaction;
-pub mod reaction;
+pub mod material;
+pub mod molecular;
+pub mod polymer;
 pub mod presets;
+pub mod reaction;
+pub mod substance;
 
 // -- Primary re-exports -------------------------------------------------------
 
-pub use element::Element;
-pub use substance::Substance;
-pub use molecular::{Molecule, Bond, BondKind};
-pub use crystal::{Crystal, LatticeType};
-pub use polymer::PolymerChain;
 pub use compile::{compile, compile_as};
+pub use crystal::{Crystal, LatticeType};
+pub use element::Element;
+pub use material::{MaterialDef, MaterialId, PhaseState};
+pub use molecular::{Bond, BondKind, Molecule};
+pub use polymer::PolymerChain;
 pub use reaction::Reaction;
-pub use material::{MaterialDef, PhaseState, MaterialId};
+pub use substance::Substance;
 
 /// Convenience prelude — import everything commonly needed.
 ///
@@ -75,16 +75,15 @@ pub use material::{MaterialDef, PhaseState, MaterialId};
 /// let iron = compile(&Substance::Crystalline(Crystal::iron()));
 /// ```
 pub mod prelude {
-    pub use crate::element::Element;
-    pub use crate::substance::Substance;
-    pub use crate::molecular::{Molecule, Bond, BondKind};
-    pub use crate::crystal::{Crystal, LatticeType};
-    pub use crate::polymer::PolymerChain;
     pub use crate::compile::{compile, compile_as};
-    pub use crate::reaction::Reaction;
+    pub use crate::crystal::{Crystal, LatticeType};
+    pub use crate::element::Element;
     pub use crate::material::{
-        MaterialDef, PhaseState, MaterialId,
-        StructuralProps, ThermalProps, ChemicalProps,
-        HydraulicProps, PhaseProps, AcousticProps, OpticalProps,
+        AcousticProps, ChemicalProps, HydraulicProps, MaterialDef, MaterialId, OpticalProps,
+        PhaseProps, PhaseState, StructuralProps, ThermalProps,
     };
+    pub use crate::molecular::{Bond, BondKind, Molecule};
+    pub use crate::polymer::PolymerChain;
+    pub use crate::reaction::Reaction;
+    pub use crate::substance::Substance;
 }

@@ -80,12 +80,12 @@ pub struct StructuralProps {
 impl Default for StructuralProps {
     fn default() -> Self {
         Self {
-            density:            1000.0,
-            yield_strength:     0.0,
-            impact_toughness:   0.5,
-            plasticity:         0.0,
+            density: 1000.0,
+            yield_strength: 0.0,
+            impact_toughness: 0.5,
+            plasticity: 0.0,
             abrasion_resistance: 0.5,
-            compaction:         None,
+            compaction: None,
         }
     }
 }
@@ -122,16 +122,16 @@ pub struct ThermalProps {
 impl Default for ThermalProps {
     fn default() -> Self {
         Self {
-            specific_heat:           1000.0,
-            thermal_conductivity:    1.0,
-            ignition_point:          None,
-            melting_point:           None,
-            vaporisation_point:      None,
-            freezing_point:          None,
-            melt_product:            None,
-            freeze_product:          None,
-            burn_product:            None,
-            combustion_energy:       0.0,
+            specific_heat: 1000.0,
+            thermal_conductivity: 1.0,
+            ignition_point: None,
+            melting_point: None,
+            vaporisation_point: None,
+            freezing_point: None,
+            melt_product: None,
+            freeze_product: None,
+            burn_product: None,
+            combustion_energy: 0.0,
             emission_onset_temperature: None,
         }
     }
@@ -152,11 +152,11 @@ pub struct ChemicalProps {
 impl Default for ChemicalProps {
     fn default() -> Self {
         Self {
-            ph:                   7.0,
-            acid_solubility:      0.0,
-            base_solubility:      0.0,
+            ph: 7.0,
+            acid_solubility: 0.0,
+            base_solubility: 0.0,
             oxidation_resistance: 1.0,
-            corrosion_product:    None,
+            corrosion_product: None,
         }
     }
 }
@@ -175,9 +175,9 @@ pub struct HydraulicProps {
 impl Default for HydraulicProps {
     fn default() -> Self {
         Self {
-            porosity:                      0.0,
-            permeability:                  0.0,
-            saturation_ignition_modifier:  0.0,
+            porosity: 0.0,
+            permeability: 0.0,
+            saturation_ignition_modifier: 0.0,
             saturation_conductivity_modifier: 0.0,
         }
     }
@@ -205,10 +205,10 @@ pub struct PhaseProps {
 impl Default for PhaseProps {
     fn default() -> Self {
         Self {
-            state:           PhaseState::Solid,
-            repose_angle:    90.0,
-            viscosity:       0.0,
-            buoyancy:        1.0,
+            state: PhaseState::Solid,
+            repose_angle: 90.0,
+            viscosity: 0.0,
+            buoyancy: 1.0,
             relaxation_time: 1.0,
             surface_tension: 0.0,
         }
@@ -238,8 +238,8 @@ impl Default for AcousticProps {
     fn default() -> Self {
         Self {
             propagation_speed: 343.0,
-            damping:           0.1,
-            reflectance:       0.5,
+            damping: 0.1,
+            reflectance: 0.5,
         }
     }
 }
@@ -249,27 +249,27 @@ impl Default for AcousticProps {
 /// Complete physical description of a material type.
 #[derive(Debug, Clone)]
 pub struct MaterialDef {
-    pub name:       String,
+    pub name: String,
     pub structural: StructuralProps,
-    pub thermal:    ThermalProps,
-    pub chemical:   ChemicalProps,
-    pub hydraulic:  HydraulicProps,
-    pub phase:      PhaseProps,
-    pub acoustic:   AcousticProps,
-    pub optical:    OpticalProps,
+    pub thermal: ThermalProps,
+    pub chemical: ChemicalProps,
+    pub hydraulic: HydraulicProps,
+    pub phase: PhaseProps,
+    pub acoustic: AcousticProps,
+    pub optical: OpticalProps,
 }
 
 impl Default for MaterialDef {
     fn default() -> Self {
         Self {
-            name:       "unnamed".to_string(),
+            name: "unnamed".to_string(),
             structural: StructuralProps::default(),
-            thermal:    ThermalProps::default(),
-            chemical:   ChemicalProps::default(),
-            hydraulic:  HydraulicProps::default(),
-            phase:      PhaseProps::default(),
-            acoustic:   AcousticProps::default(),
-            optical:    OpticalProps::default(),
+            thermal: ThermalProps::default(),
+            chemical: ChemicalProps::default(),
+            hydraulic: HydraulicProps::default(),
+            phase: PhaseProps::default(),
+            acoustic: AcousticProps::default(),
+            optical: OpticalProps::default(),
         }
     }
 }

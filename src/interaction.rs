@@ -13,7 +13,7 @@ pub enum MaterialMatcher {
     Exact(MaterialId),
     WithProperty {
         property: MaterialProperty,
-        range:    RangeInclusive<f32>,
+        range: RangeInclusive<f32>,
     },
     All(Vec<MaterialMatcher>),
     Any(Vec<MaterialMatcher>),
@@ -63,15 +63,15 @@ pub enum InteractionTrigger {
     },
     TemperatureThreshold {
         material: MaterialMatcher,
-        celsius:  f32,
+        celsius: f32,
     },
     PressureThreshold {
         material: MaterialMatcher,
-        pascals:  f32,
+        pascals: f32,
     },
     SaturationThreshold {
         material: MaterialMatcher,
-        level:    f32,
+        level: f32,
     },
 }
 
@@ -79,9 +79,9 @@ pub enum InteractionTrigger {
 
 #[derive(Debug, Clone)]
 pub struct InteractionCondition {
-    pub target:    ConditionTarget,
-    pub property:  MaterialProperty,
-    pub op:        CompareOp,
+    pub target: ConditionTarget,
+    pub property: MaterialProperty,
+    pub op: CompareOp,
     pub threshold: f32,
 }
 
@@ -103,11 +103,11 @@ pub enum CompareOp {
 impl CompareOp {
     pub fn eval(self, lhs: f32, rhs: f32) -> bool {
         match self {
-            Self::LessThan        => lhs < rhs,
-            Self::LessThanOrEq    => lhs <= rhs,
-            Self::GreaterThan     => lhs > rhs,
+            Self::LessThan => lhs < rhs,
+            Self::LessThanOrEq => lhs <= rhs,
+            Self::GreaterThan => lhs > rhs,
             Self::GreaterThanOrEq => lhs >= rhs,
-            Self::Equal           => (lhs - rhs).abs() < f32::EPSILON,
+            Self::Equal => (lhs - rhs).abs() < f32::EPSILON,
         }
     }
 }
@@ -116,26 +116,32 @@ impl CompareOp {
 
 #[derive(Debug, Clone)]
 pub enum InteractionEffect {
-    TransformA { into: MaterialTransform },
-    TransformB { into: MaterialTransform },
+    TransformA {
+        into: MaterialTransform,
+    },
+    TransformB {
+        into: MaterialTransform,
+    },
     AddHeat {
-        target:               EffectTarget,
+        target: EffectTarget,
         delta_celsius_per_tick: f32,
     },
     AddSaturation {
-        target:        EffectTarget,
+        target: EffectTarget,
         delta_per_tick: f32,
     },
     ApplyImpulse {
-        target:    EffectTarget,
+        target: EffectTarget,
         direction: ImpulseDir,
-        newtons:   f32,
+        newtons: f32,
     },
     SpawnInto {
         material: MaterialId,
-        target:   EffectTarget,
+        target: EffectTarget,
     },
-    WeakenBond { rate: f32 },
+    WeakenBond {
+        rate: f32,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -168,9 +174,9 @@ pub enum ImpulseDir {
 
 #[derive(Debug, Clone)]
 pub struct InteractionRule {
-    pub id:          String,
-    pub trigger:     InteractionTrigger,
-    pub conditions:  Vec<InteractionCondition>,
-    pub effects:     Vec<InteractionEffect>,
+    pub id: String,
+    pub trigger: InteractionTrigger,
+    pub conditions: Vec<InteractionCondition>,
+    pub effects: Vec<InteractionEffect>,
     pub probability: f32,
 }

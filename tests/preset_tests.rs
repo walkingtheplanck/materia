@@ -1,7 +1,7 @@
 //! Tests for preset world materials.
 
-use materia::presets;
 use materia::material::PhaseState;
+use materia::presets;
 
 // -- Phase state correctness --
 
@@ -9,7 +9,11 @@ use materia::material::PhaseState;
 fn stone_is_solid() {
     let mat = presets::stone();
     assert_eq!(mat.phase.state, PhaseState::Solid);
-    assert!(mat.structural.density > 2000.0, "Stone density {}", mat.structural.density);
+    assert!(
+        mat.structural.density > 2000.0,
+        "Stone density {}",
+        mat.structural.density
+    );
 }
 
 #[test]
@@ -29,7 +33,10 @@ fn dirt_is_granular() {
 fn grass_is_solid() {
     let mat = presets::grass();
     assert_eq!(mat.phase.state, PhaseState::Solid);
-    assert!(mat.thermal.ignition_point.is_some(), "Grass should be flammable");
+    assert!(
+        mat.thermal.ignition_point.is_some(),
+        "Grass should be flammable"
+    );
 }
 
 #[test]
@@ -64,7 +71,11 @@ fn lava_is_liquid() {
 fn air_is_gas() {
     let mat = presets::air();
     assert_eq!(mat.phase.state, PhaseState::Gas);
-    assert!(mat.structural.density < 5.0, "Air density {}", mat.structural.density);
+    assert!(
+        mat.structural.density < 5.0,
+        "Air density {}",
+        mat.structural.density
+    );
 }
 
 #[test]
@@ -113,16 +124,24 @@ fn lava_more_viscous_than_water() {
 fn iron_denser_than_stone() {
     let iron = presets::iron();
     let stone = presets::stone();
-    assert!(iron.structural.density > stone.structural.density,
-        "Iron {} should be denser than stone {}", iron.structural.density, stone.structural.density);
+    assert!(
+        iron.structural.density > stone.structural.density,
+        "Iron {} should be denser than stone {}",
+        iron.structural.density,
+        stone.structural.density
+    );
 }
 
 #[test]
 fn gold_denser_than_iron() {
     let gold = presets::gold();
     let iron = presets::iron();
-    assert!(gold.structural.density > iron.structural.density,
-        "Gold {} should be denser than iron {}", gold.structural.density, iron.structural.density);
+    assert!(
+        gold.structural.density > iron.structural.density,
+        "Gold {} should be denser than iron {}",
+        gold.structural.density,
+        iron.structural.density
+    );
 }
 
 #[test]
@@ -161,9 +180,14 @@ fn all_presets_compile_without_panic() {
 
     eprintln!("Preset materials:");
     for mat in &materials {
-        eprintln!("  {:<10} phase={:?} density={:.0} tau={:.1} color={:.2?}",
-            mat.name, mat.phase.state, mat.structural.density,
-            mat.phase.relaxation_time, mat.optical.base_color);
+        eprintln!(
+            "  {:<10} phase={:?} density={:.0} tau={:.1} color={:.2?}",
+            mat.name,
+            mat.phase.state,
+            mat.structural.density,
+            mat.phase.relaxation_time,
+            mat.optical.base_color
+        );
     }
 
     assert_eq!(materials.len(), 20);

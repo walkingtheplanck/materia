@@ -33,24 +33,24 @@ impl LatticeType {
     /// Atomic packing fraction.
     pub fn packing_fraction(&self) -> f32 {
         match self {
-            LatticeType::BCC     => 0.680,
-            LatticeType::FCC     => 0.740,
-            LatticeType::HCP     => 0.740,
-            LatticeType::BCT     => 0.700,
+            LatticeType::BCC => 0.680,
+            LatticeType::FCC => 0.740,
+            LatticeType::HCP => 0.740,
+            LatticeType::BCT => 0.700,
             LatticeType::Diamond => 0.340,
-            LatticeType::Ionic   => 0.660,
+            LatticeType::Ionic => 0.660,
         }
     }
 
     /// Coordination number (nearest neighbours).
     pub fn coordination_number(&self) -> u32 {
         match self {
-            LatticeType::BCC     => 8,
-            LatticeType::FCC     => 12,
-            LatticeType::HCP     => 12,
-            LatticeType::BCT     => 8,
+            LatticeType::BCC => 8,
+            LatticeType::FCC => 12,
+            LatticeType::HCP => 12,
+            LatticeType::BCT => 8,
             LatticeType::Diamond => 4,
-            LatticeType::Ionic   => 6,
+            LatticeType::Ionic => 6,
         }
     }
 }

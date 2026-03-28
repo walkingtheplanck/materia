@@ -32,9 +32,11 @@ pub fn compile(substance: &Substance) -> MaterialDef {
         Substance::Molecular(mol) => compile_molecular(mol),
         Substance::Crystalline(c) => compile_crystal(c),
         Substance::Polymer(p) => compile_polymer(p),
-        Substance::Amorphous { name, composition, density } => {
-            compile_amorphous(name, composition, *density)
-        }
+        Substance::Amorphous {
+            name,
+            composition,
+            density,
+        } => compile_amorphous(name, composition, *density),
     }
 }
 
@@ -104,7 +106,7 @@ fn compile_molecular(mol: &Molecule) -> MaterialDef {
         PhaseState::Liquid => 0.6,
         PhaseState::Gas => 0.025,
         _ => 0.5,
-        };
+    };
 
     // Viscosity via Andrade equation for liquids
     let viscosity = if state == PhaseState::Liquid {
@@ -113,12 +115,7 @@ fn compile_molecular(mol: &Molecule) -> MaterialDef {
         0.0
     };
 
-    let optical = estimate_optical(
-        &Substance::Molecular(mol.clone()),
-        state,
-        false,
-        density,
-    );
+    let optical = estimate_optical(&Substance::Molecular(mol.clone()), state, false, density);
 
     MaterialDef {
         name: mol.name.clone(),
@@ -133,7 +130,11 @@ fn compile_molecular(mol: &Molecule) -> MaterialDef {
             melting_point: Some(mp_c),
             vaporisation_point: Some(bp_c),
             freezing_point: Some(mp_c),
-            combustion_energy: if mol.atoms.contains(&Element::C) { bond_energy * 0.5 } else { 0.0 },
+            combustion_energy: if mol.atoms.contains(&Element::C) {
+                bond_energy * 0.5
+            } else {
+                0.0
+            },
             ..Default::default()
         },
         phase: PhaseProps {
@@ -145,7 +146,11 @@ fn compile_molecular(mol: &Molecule) -> MaterialDef {
                 1.0
             },
             surface_tension: if state == PhaseState::Liquid {
-                if mol.has_hydrogen_bonds() { 0.072 } else { 0.025 } // N/m
+                if mol.has_hydrogen_bonds() {
+                    0.072
+                } else {
+                    0.025
+                } // N/m
             } else {
                 0.0
             },
@@ -162,7 +167,7 @@ fn compile_molecular(mol: &Molecule) -> MaterialDef {
 /// For compounds, use intermolecular force model:
 /// - Hydrogen bonding: higher Tm (water ~0C)
 /// - Van der Waals: scales with molecular mass
-/// Ref: Empirical correlations, CRC Handbook.
+///   Ref: Empirical correlations, CRC Handbook.
 fn estimate_molecular_melting(mol: &Molecule) -> f32 {
     // Check for pure element molecules (O2, H2, N2, etc.)
     if let Some(elem) = pure_element_molecule(mol) {
@@ -253,7 +258,7 @@ fn estimate_molecular_density(mol: &Molecule, state: PhaseState) -> f32 {
 /// - Monoatomic: f=3 -> Cp = 5R/(2M) (includes PV work term for Cp)
 /// - Diatomic/linear: f=5 -> Cp = 7R/(2M)
 /// - Polyatomic: f=6+ -> Cp = 4R/M (approximate)
-/// Ref: Kittel Ch. 5, Atkins "Physical Chemistry".
+///   Ref: Kittel Ch. 5, Atkins "Physical Chemistry".
 fn estimate_molecular_specific_heat(mol: &Molecule, state: PhaseState) -> f32 {
     let mass = mol.molecular_mass();
     let has_oh = mol.atoms.contains(&Element::O) && mol.atoms.contains(&Element::H);
@@ -354,10 +359,10 @@ fn estimate_crystal_boiling(c: &Crystal, melting: f32) -> f32 {
         CrystalClass::Metallic => {
             let base_bp = c.base.boiling_point_pure();
             // Solute effects on boiling are smaller than on melting
-            let solute_shift: f32 = c.solutes.iter()
-                .map(|(elem, frac)| {
-                    (elem.boiling_point_pure() - base_bp) * frac * 0.5
-                })
+            let solute_shift: f32 = c
+                .solutes
+                .iter()
+                .map(|(elem, frac)| (elem.boiling_point_pure() - base_bp) * frac * 0.5)
                 .sum();
             base_bp + solute_shift
         }
@@ -435,9 +440,7 @@ fn compile_amorphous(name: &str, comp: &[(Element, f32)], density: f32) -> Mater
     let is_metal = comp.iter().any(|(e, f)| e.is_metal() && *f > 0.3);
 
     // Weighted melting point
-    let melting: f32 = comp.iter()
-        .map(|(e, f)| e.melting_point_pure() * f)
-        .sum();
+    let melting: f32 = comp.iter().map(|(e, f)| e.melting_point_pure() * f).sum();
 
     let yield_strength = if is_metal {
         200e6
@@ -503,19 +506,20 @@ fn estimate_crystal_density(c: &Crystal) -> f32 {
 
     // Lattice parameter from atomic radius
     // a = f(r) where the factor depends on lattice geometry
-    let a = r_m * match c.lattice {
-        LatticeType::BCC => 4.0 / 3.0_f32.sqrt(),          // a = 4r/sqrt(3)
-        LatticeType::FCC => 2.0 * 2.0_f32.sqrt(),           // a = 2*sqrt(2)*r
-        LatticeType::HCP => 2.0,                             // a = 2r
-        LatticeType::BCT => 4.0 / 3.0_f32.sqrt(),           // similar to BCC
-        LatticeType::Diamond => 8.0 / 3.0_f32.sqrt(),       // a = 8r/sqrt(3)
-        LatticeType::Ionic => 2.5,                            // approximate
-    };
+    let a = r_m
+        * match c.lattice {
+            LatticeType::BCC => 4.0 / 3.0_f32.sqrt(), // a = 4r/sqrt(3)
+            LatticeType::FCC => 2.0 * 2.0_f32.sqrt(), // a = 2*sqrt(2)*r
+            LatticeType::HCP => 2.0,                  // a = 2r
+            LatticeType::BCT => 4.0 / 3.0_f32.sqrt(), // similar to BCC
+            LatticeType::Diamond => 8.0 / 3.0_f32.sqrt(), // a = 8r/sqrt(3)
+            LatticeType::Ionic => 2.5,                // approximate
+        };
 
     let atoms_per_cell: f32 = match c.lattice {
         LatticeType::BCC => 2.0,
         LatticeType::FCC => 4.0,
-        LatticeType::HCP => 6.0,  // effective for hexagonal cell
+        LatticeType::HCP => 6.0, // effective for hexagonal cell
         LatticeType::BCT => 2.0,
         LatticeType::Diamond => 8.0,
         LatticeType::Ionic => 4.0,
@@ -528,7 +532,9 @@ fn estimate_crystal_density(c: &Crystal) -> f32 {
 
     // Adjust for solutes
     let solute_frac: f32 = c.solutes.iter().map(|(_, f)| f).sum();
-    let solute_mass: f32 = c.solutes.iter()
+    let solute_mass: f32 = c
+        .solutes
+        .iter()
         .map(|(e, f)| e.atomic_mass() * f)
         .sum::<f32>();
 
@@ -551,15 +557,17 @@ fn estimate_melting_point(c: &Crystal) -> f32 {
             let base_tm = c.base.melting_point_pure();
             // Solute effect: each solute depresses or shifts melting point
             // Typical depression ~ -50 to -200 C per wt% for interstitials
-            let solute_effect: f32 = c.solutes.iter()
+            let solute_effect: f32 = c
+                .solutes
+                .iter()
                 .map(|(elem, frac)| {
                     // Interstitial solutes (C, N, B) cause larger depression
-                    let depression_factor = if matches!(elem, Element::C | Element::N | Element::B) {
+                    let depression_factor = if matches!(elem, Element::C | Element::N | Element::B)
+                    {
                         -5000.0 // strong effect per weight fraction
                     } else {
                         // Substitutional solutes: smaller effect
-                        let delta_tm = elem.melting_point_pure() - base_tm;
-                        delta_tm // blend toward solute melting point
+                        elem.melting_point_pure() - base_tm // blend toward solute melting point
                     };
                     depression_factor * frac
                 })
@@ -649,9 +657,7 @@ fn estimate_yield_strength(c: &Crystal) -> f32 {
     let peierls = shear_mod / 30.0;
 
     // Solute hardening: each solute adds strength proportional to sqrt(fraction)
-    let solute_hardening: f32 = c.solutes.iter()
-        .map(|(_, frac)| 500e6 * frac.sqrt())
-        .sum();
+    let solute_hardening: f32 = c.solutes.iter().map(|(_, frac)| 500e6 * frac.sqrt()).sum();
 
     peierls + solute_hardening
 }
@@ -679,8 +685,8 @@ fn estimate_emissivity(is_metal: bool, roughness: f32) -> f32 {
 /// - Water (1000 kg/m^3) -> n = 1.33
 /// - Glass  (2500 kg/m^3) -> n = 1.52
 /// - Diamond (3500 kg/m^3) -> n = 2.42
-/// Metals: complex refractive index, n > 2 typically.
-/// Ref: Born & Wolf, "Principles of Optics", Chapter 2.
+///   Metals: complex refractive index, n > 2 typically.
+///   Ref: Born & Wolf, "Principles of Optics", Chapter 2.
 fn estimate_ior(density: f32, is_metal: bool) -> f32 {
     if is_metal {
         // Metals have complex refractive index; real part typically 2-3+
@@ -699,7 +705,7 @@ fn estimate_ior(density: f32, is_metal: bool) -> f32 {
 /// Simplified: viscosity correlates exponentially with melting point.
 /// - Low Tm (water, 0C) -> low viscosity (~0.001 Pa*s)
 /// - High Tm (basalt, ~1200C) -> high viscosity (~100-10000 Pa*s)
-/// Ref: Andrade, "Viscosity of Liquids", Nature (1930).
+///   Ref: Andrade, "Viscosity of Liquids", Nature (1930).
 fn estimate_viscosity(melting_point_c: f32) -> f32 {
     // Normalize to water's melting point (273K)
     let tm_normalized = (melting_point_c + 273.0) / 373.0;
@@ -718,17 +724,15 @@ fn estimate_optical(
     density: f32,
 ) -> OpticalProps {
     match sub {
-        Substance::Crystalline(c) if is_metal => {
-            OpticalProps {
-                base_color: c.base.base_color(),
-                metallic: 1.0,
-                roughness: 0.3,
-                opacity: 1.0,
-                refractive_index: 2.5,
-                emissivity: 0.3,
-                ..Default::default()
-            }
-        }
+        Substance::Crystalline(c) if is_metal => OpticalProps {
+            base_color: c.base.base_color(),
+            metallic: 1.0,
+            roughness: 0.3,
+            opacity: 1.0,
+            refractive_index: 2.5,
+            emissivity: 0.3,
+            ..Default::default()
+        },
         Substance::Molecular(mol) => {
             let is_water = mol.name == "water";
             if is_water {
@@ -763,26 +767,22 @@ fn estimate_optical(
                 }
             }
         }
-        Substance::Polymer(_p) => {
-            OpticalProps {
-                base_color: [0.9, 0.9, 0.85, 1.0],
-                metallic: 0.0,
-                roughness: 0.6,
-                opacity: 1.0,
-                refractive_index: 1.5,
-                ..Default::default()
-            }
-        }
-        Substance::Crystalline(_) | Substance::Amorphous { .. } => {
-            OpticalProps {
-                base_color: [0.6, 0.6, 0.55, 1.0],
-                metallic: 0.0,
-                roughness: 0.7,
-                opacity: 1.0,
-                refractive_index: estimate_ior(density, false),
-                ..Default::default()
-            }
-        }
+        Substance::Polymer(_p) => OpticalProps {
+            base_color: [0.9, 0.9, 0.85, 1.0],
+            metallic: 0.0,
+            roughness: 0.6,
+            opacity: 1.0,
+            refractive_index: 1.5,
+            ..Default::default()
+        },
+        Substance::Crystalline(_) | Substance::Amorphous { .. } => OpticalProps {
+            base_color: [0.6, 0.6, 0.55, 1.0],
+            metallic: 0.0,
+            roughness: 0.7,
+            opacity: 1.0,
+            refractive_index: estimate_ior(density, false),
+            ..Default::default()
+        },
     }
 }
 
@@ -796,9 +796,7 @@ fn estimate_optical(
 /// Dulong-Petit: Cp = 25/M * 1000 J/(kg*K).
 /// Ref: Kittel, Chapter 5.
 fn estimate_specific_heat_from_mass(comp: &[(Element, f32)]) -> f32 {
-    let avg_mass: f32 = comp.iter()
-        .map(|(e, f)| e.atomic_mass() * f)
-        .sum();
+    let avg_mass: f32 = comp.iter().map(|(e, f)| e.atomic_mass() * f).sum();
     if avg_mass > 0.0 {
         dulong_petit(avg_mass)
     } else {
@@ -854,12 +852,13 @@ fn adjust_for_phase(mat: &mut MaterialDef, sub: &Substance, target_phase: PhaseS
             // Determine effective temperature: if natural phase was solid with
             // high density (rock/metal), this is a high-temperature melt regardless
             // of what the weighted-average melting point says.
-            let effective_temp_k = if natural_phase == PhaseState::Solid && mat.structural.density > 2000.0 {
-                // Rock melt: assume ~1200C (basalt liquidus)
-                mat.thermal.melting_point.unwrap_or(1200.0).max(1200.0) + 273.15
-            } else {
-                mat.thermal.melting_point.unwrap_or(0.0) + 273.15
-            };
+            let effective_temp_k =
+                if natural_phase == PhaseState::Solid && mat.structural.density > 2000.0 {
+                    // Rock melt: assume ~1200C (basalt liquidus)
+                    mat.thermal.melting_point.unwrap_or(1200.0).max(1200.0) + 273.15
+                } else {
+                    mat.thermal.melting_point.unwrap_or(0.0) + 273.15
+                };
             if effective_temp_k > 773.15 {
                 // Above ~500C — should visibly glow
                 mat.optical.emissivity = 0.9;
@@ -905,7 +904,11 @@ fn estimate_molar_mass(sub: &Substance) -> f32 {
             // Weighted average atomic mass
             let total: f32 = composition.iter().map(|(_, f)| f).sum();
             if total > 0.0 {
-                composition.iter().map(|(e, f)| e.atomic_mass() * f).sum::<f32>() / total
+                composition
+                    .iter()
+                    .map(|(e, f)| e.atomic_mass() * f)
+                    .sum::<f32>()
+                    / total
             } else {
                 30.0 // fallback
             }
@@ -922,9 +925,17 @@ fn estimate_liquid_viscosity_for_phase(mat: &MaterialDef, natural_phase: PhaseSt
     // Dense solids (rocks, metals) produce viscous melts.
     if natural_phase == PhaseState::Solid {
         let density = mat.structural.density;
-        if density > 2000.0 { 100.0 }      // lava-like (silicate melts)
-        else if density > 1000.0 { 1.0 }   // molten polymer/wax
-        else { 0.01 }                       // light solid melted
+        if density > 2000.0 {
+            100.0
+        }
+        // lava-like (silicate melts)
+        else if density > 1000.0 {
+            1.0
+        }
+        // molten polymer/wax
+        else {
+            0.01
+        } // light solid melted
     } else if let Some(mp) = mat.thermal.melting_point {
         // Naturally liquid material: use Andrade-style estimate
         estimate_viscosity(mp)
@@ -938,7 +949,7 @@ fn estimate_liquid_viscosity_for_phase(mat: &MaterialDef, natural_phase: PhaseSt
 /// tau = 0.5 + 3*nu in lattice Boltzmann units.
 /// Rough mapping: water(0.001) -> tau=0.8, lava(100) -> tau=5.0.
 fn viscosity_to_tau(viscosity: f32) -> f32 {
-    (0.8 + viscosity.log10().max(-3.0).min(5.0) * 0.5).clamp(0.55, 10.0)
+    (0.8 + viscosity.log10().clamp(-3.0, 5.0) * 0.5).clamp(0.55, 10.0)
 }
 
 /// Wien's law: approximate blackbody color from temperature in Kelvin.
@@ -949,8 +960,8 @@ fn viscosity_to_tau(viscosity: f32) -> f32 {
 fn planck_color(temp_k: f32) -> [f32; 3] {
     let t = (temp_k / 1000.0).clamp(1.0, 10.0);
     let r = (1.0 - (-0.5 * (t - 1.0)).exp()).min(1.0);
-    let g = (1.0 - (-0.3 * (t - 2.0)).exp()).max(0.0).min(1.0);
-    let b = (1.0 - (-0.2 * (t - 4.0)).exp()).max(0.0).min(1.0);
+    let g = (1.0 - (-0.3 * (t - 2.0)).exp()).clamp(0.0, 1.0);
+    let b = (1.0 - (-0.2 * (t - 4.0)).exp()).clamp(0.0, 1.0);
     [r, g, b]
 }
 
@@ -967,9 +978,21 @@ fn incandescent_color(temp_k: f32) -> [f32; 4] {
 /// Estimate yield strength for amorphous materials based on composition.
 fn estimate_amorphous_yield(comp: &[(Element, f32)], density: f32) -> f32 {
     // Yield strength correlates with density and bond strength
-    let si_frac: f32 = comp.iter().filter(|(e, _)| *e == Element::Si).map(|(_, f)| f).sum();
-    let fe_frac: f32 = comp.iter().filter(|(e, _)| *e == Element::Fe).map(|(_, f)| f).sum();
-    let c_frac: f32 = comp.iter().filter(|(e, _)| *e == Element::C).map(|(_, f)| f).sum();
+    let si_frac: f32 = comp
+        .iter()
+        .filter(|(e, _)| *e == Element::Si)
+        .map(|(_, f)| f)
+        .sum();
+    let fe_frac: f32 = comp
+        .iter()
+        .filter(|(e, _)| *e == Element::Fe)
+        .map(|(_, f)| f)
+        .sum();
+    let c_frac: f32 = comp
+        .iter()
+        .filter(|(e, _)| *e == Element::C)
+        .map(|(_, f)| f)
+        .sum();
 
     let base = density * 30.0; // rough: denser = stronger
     let silica_boost = si_frac * 300e6; // silicate rocks are strong
@@ -990,7 +1013,7 @@ fn estimate_amorphous_yield(comp: &[(Element, f32)], density: f32) -> f32 {
 /// - TiO2: brilliant white pigment
 /// - Cr2O3: green
 /// - CuO: black/green
-/// Ref: Standard mineralogy references, Dana's Manual of Mineralogy.
+///   Ref: Standard mineralogy references, Dana's Manual of Mineralogy.
 fn estimate_amorphous_color(comp: &[(Element, f32)]) -> [f32; 4] {
     let mut r = 0.0f32;
     let mut g = 0.0f32;
@@ -1029,14 +1052,14 @@ fn oxide_pigment_color(elem: Element) -> (f32, f32, f32) {
         Element::Cr => (0.30, 0.50, 0.25), // Cr2O3: green
         Element::Cu => (0.20, 0.35, 0.25), // CuO: dark green/black
         Element::Mn => (0.35, 0.25, 0.25), // MnO2: dark brown/black
-        Element::K  => (0.80, 0.78, 0.75), // K2O: white/gray
+        Element::K => (0.80, 0.78, 0.75),  // K2O: white/gray
         Element::Na => (0.82, 0.80, 0.78), // Na2O: white
-        Element::O  => (0.75, 0.75, 0.73), // as oxide: neutral
-        Element::C  => (0.20, 0.18, 0.15), // organic carbon: dark brown/black
-        Element::H  => (0.80, 0.80, 0.80), // water/hydroxyl: neutral
-        Element::N  => (0.60, 0.55, 0.45), // organic nitrogen: brownish
-        Element::P  => (0.70, 0.65, 0.55), // phosphate: tan
-        Element::S  => (0.80, 0.75, 0.30), // sulfide/sulfate: yellowish
+        Element::O => (0.75, 0.75, 0.73),  // as oxide: neutral
+        Element::C => (0.20, 0.18, 0.15),  // organic carbon: dark brown/black
+        Element::H => (0.80, 0.80, 0.80),  // water/hydroxyl: neutral
+        Element::N => (0.60, 0.55, 0.45),  // organic nitrogen: brownish
+        Element::P => (0.70, 0.65, 0.55),  // phosphate: tan
+        Element::S => (0.80, 0.75, 0.30),  // sulfide/sulfate: yellowish
         _ => {
             // Fallback: use element's base color
             let [er, eg, eb, _] = elem.base_color();

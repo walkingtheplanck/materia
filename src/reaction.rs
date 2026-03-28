@@ -61,14 +61,12 @@ impl Reaction {
             },
         };
 
-        let conditions = vec![
-            InteractionCondition {
-                target: ConditionTarget::A,
-                property: MaterialProperty::Temperature,
-                op: CompareOp::GreaterThan,
-                threshold: temp_threshold,
-            }
-        ];
+        let conditions = vec![InteractionCondition {
+            target: ConditionTarget::A,
+            property: MaterialProperty::Temperature,
+            op: CompareOp::GreaterThan,
+            threshold: temp_threshold,
+        }];
 
         let heat_effect = if self.is_exothermic() {
             InteractionEffect::AddHeat {
@@ -154,9 +152,7 @@ impl Reaction {
                 Substance::Crystalline(Crystal::diamond()), // using diamond as pure C
                 Substance::Molecular(Molecule::oxygen_gas()),
             ],
-            products: vec![
-                Substance::Molecular(Molecule::carbon_dioxide()),
-            ],
+            products: vec![Substance::Molecular(Molecule::carbon_dioxide())],
             activation_energy: 200.0,
             catalyst: None,
         }
@@ -180,8 +176,16 @@ impl Reaction {
                 r
             },
             products: vec![
-                Substance::amorphous("iron_oxide", &[(Element::Fe, 0.70), (Element::O, 0.30)], 5240.0),
-                Substance::amorphous("iron_oxide", &[(Element::Fe, 0.70), (Element::O, 0.30)], 5240.0),
+                Substance::amorphous(
+                    "iron_oxide",
+                    &[(Element::Fe, 0.70), (Element::O, 0.30)],
+                    5240.0,
+                ),
+                Substance::amorphous(
+                    "iron_oxide",
+                    &[(Element::Fe, 0.70), (Element::O, 0.30)],
+                    5240.0,
+                ),
             ],
             activation_energy: 50.0,
             catalyst: None,
@@ -198,8 +202,16 @@ impl Reaction {
                 Substance::Molecular(Molecule::oxygen_gas()),
             ],
             products: vec![
-                Substance::amorphous("copper_oxide", &[(Element::Cu, 0.80), (Element::O, 0.20)], 6310.0),
-                Substance::amorphous("copper_oxide", &[(Element::Cu, 0.80), (Element::O, 0.20)], 6310.0),
+                Substance::amorphous(
+                    "copper_oxide",
+                    &[(Element::Cu, 0.80), (Element::O, 0.20)],
+                    6310.0,
+                ),
+                Substance::amorphous(
+                    "copper_oxide",
+                    &[(Element::Cu, 0.80), (Element::O, 0.20)],
+                    6310.0,
+                ),
             ],
             activation_energy: 40.0,
             catalyst: None,
@@ -220,8 +232,16 @@ impl Reaction {
                 r
             },
             products: vec![
-                Substance::amorphous("alumina", &[(Element::Al, 0.53), (Element::O, 0.47)], 3950.0),
-                Substance::amorphous("alumina", &[(Element::Al, 0.53), (Element::O, 0.47)], 3950.0),
+                Substance::amorphous(
+                    "alumina",
+                    &[(Element::Al, 0.53), (Element::O, 0.47)],
+                    3950.0,
+                ),
+                Substance::amorphous(
+                    "alumina",
+                    &[(Element::Al, 0.53), (Element::O, 0.47)],
+                    3950.0,
+                ),
             ],
             activation_energy: 10.0, // very low — happens spontaneously
             catalyst: None,
@@ -263,11 +283,17 @@ impl Reaction {
     pub fn calcination() -> Self {
         Self {
             name: "calcination".into(),
-            reactants: vec![
-                Substance::amorphous("limestone", &[(Element::Ca, 0.40), (Element::C, 0.12), (Element::O, 0.48)], 2710.0),
-            ],
+            reactants: vec![Substance::amorphous(
+                "limestone",
+                &[(Element::Ca, 0.40), (Element::C, 0.12), (Element::O, 0.48)],
+                2710.0,
+            )],
             products: vec![
-                Substance::amorphous("quickite", &[(Element::Ca, 0.71), (Element::O, 0.29)], 3340.0),
+                Substance::amorphous(
+                    "quickite",
+                    &[(Element::Ca, 0.71), (Element::O, 0.29)],
+                    3340.0,
+                ),
                 Substance::Molecular(Molecule::carbon_dioxide()),
             ],
             activation_energy: 180.0, // ~900°C needed
@@ -284,7 +310,11 @@ impl Reaction {
         Self {
             name: "iron_smelting".into(),
             reactants: vec![
-                Substance::amorphous("iron_ore", &[(Element::Fe, 0.70), (Element::O, 0.30)], 5240.0),
+                Substance::amorphous(
+                    "iron_ore",
+                    &[(Element::Fe, 0.70), (Element::O, 0.30)],
+                    5240.0,
+                ),
                 Substance::Molecular(Molecule::carbon_monoxide()),
                 Substance::Molecular(Molecule::carbon_monoxide()),
                 Substance::Molecular(Molecule::carbon_monoxide()),
@@ -306,7 +336,11 @@ impl Reaction {
         Self {
             name: "copper_smelting".into(),
             reactants: vec![
-                Substance::amorphous("copper_sulfide", &[(Element::Cu, 0.80), (Element::S, 0.20)], 5600.0),
+                Substance::amorphous(
+                    "copper_sulfide",
+                    &[(Element::Cu, 0.80), (Element::S, 0.20)],
+                    5600.0,
+                ),
                 Substance::Molecular(Molecule::oxygen_gas()),
             ],
             products: vec![
@@ -327,11 +361,17 @@ impl Reaction {
     pub fn magnesite_decomposition() -> Self {
         Self {
             name: "magnesite_decomposition".into(),
-            reactants: vec![
-                Substance::amorphous("magnesite", &[(Element::Mg, 0.29), (Element::C, 0.14), (Element::O, 0.57)], 3000.0),
-            ],
+            reactants: vec![Substance::amorphous(
+                "magnesite",
+                &[(Element::Mg, 0.29), (Element::C, 0.14), (Element::O, 0.57)],
+                3000.0,
+            )],
             products: vec![
-                Substance::amorphous("magnesia", &[(Element::Mg, 0.60), (Element::O, 0.40)], 3580.0),
+                Substance::amorphous(
+                    "magnesia",
+                    &[(Element::Mg, 0.60), (Element::O, 0.40)],
+                    3580.0,
+                ),
                 Substance::Molecular(Molecule::carbon_dioxide()),
             ],
             activation_energy: 160.0,
@@ -347,9 +387,7 @@ impl Reaction {
     pub fn fermentation() -> Self {
         Self {
             name: "fermentation".into(),
-            reactants: vec![
-                Substance::Molecular(Molecule::glucose()),
-            ],
+            reactants: vec![Substance::Molecular(Molecule::glucose())],
             products: vec![
                 Substance::Molecular(Molecule::ethanol()),
                 Substance::Molecular(Molecule::ethanol()),
