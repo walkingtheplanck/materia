@@ -870,12 +870,24 @@ fn adjust_for_phase(mat: &mut MaterialDef, sub: &Substance, target_phase: PhaseS
         PhaseState::Granular => {
             // Granular: lower bulk density (packing fraction ~0.6)
             mat.structural.density *= 0.6;
-            mat.phase.relaxation_time = 3.0; // high viscosity, settles slowly
-            mat.phase.repose_angle = 35.0; // typical angle of repose
-            mat.structural.yield_strength = 0.0; // no tensile strength
-            mat.hydraulic.porosity = 0.4; // 40% void space
-            mat.hydraulic.permeability = 0.01;
-            mat.optical.roughness = 0.95; // matte surface
+            mat.phase.relaxation_time = 3.0;
+            mat.phase.repose_angle = 35.0;
+            mat.structural.yield_strength = 0.0;
+            mat.optical.roughness = 0.95;
+
+            // Hydraulic properties derived from typical grain size.
+            // Default grain size estimate from density: denser materials have
+            // smaller grains when granular (sand ~0.5mm, clay ~0.002mm).
+            let grain_size = estimate_grain_size(mat.structural.density);
+            let porosity = estimate_porosity_from_grain(grain_size);
+            let permeability = kozeny_carman(grain_size, porosity);
+            let pore_radius = grain_size * 0.2; // pores ~20% of grain size
+
+            mat.hydraulic.porosity = porosity;
+            mat.hydraulic.permeability = permeability;
+            mat.hydraulic.pore_radius = pore_radius;
+            // Contact angle from substance: silicates are hydrophilic
+            mat.hydraulic.contact_angle = estimate_contact_angle(sub);
         }
         PhaseState::Solid => {
             // Solid is the default — most properties are already correct.
@@ -1065,5 +1077,75 @@ fn oxide_pigment_color(elem: Element) -> (f32, f32, f32) {
             let [er, eg, eb, _] = elem.base_color();
             (er, eg, eb)
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Hydraulic property helpers
+// ---------------------------------------------------------------------------
+
+/// Estimate grain size (meters) from bulk density of granular material.
+///
+/// Denser granular materials tend to have smaller grains:
+///   Gravel (~1800 kg/m³): ~5mm
+///   Sand (~1600 kg/m³): ~0.5mm
+///   Silt (~1400 kg/m³): ~0.05mm
+///   Clay (~1200 kg/m³): ~0.002mm
+fn estimate_grain_size(density: f32) -> f32 {
+    // Exponential fit: d = 0.01 * exp(-0.003 * density)
+    // At 1600: 0.01 * exp(-4.8) = 0.01 * 0.008 = 8e-5 ≈ 0.08mm (fine sand)
+    // Clamp to reasonable range
+    (0.01 * (-0.003 * density).exp()).clamp(1e-6, 0.01)
+}
+
+/// Estimate porosity from grain size.
+///
+/// Larger grains pack more efficiently (lower porosity).
+/// Fine particles have more surface friction (higher porosity).
+///   Gravel: ~0.30
+///   Sand: ~0.35-0.40
+///   Silt: ~0.40-0.50
+///   Clay: ~0.50-0.60
+fn estimate_porosity_from_grain(grain_size: f32) -> f32 {
+    // Porosity increases as grain size decreases
+    // φ ≈ 0.30 + 0.15 * (1 - d/d_max) where d_max = 0.01m
+    let normalized = (grain_size / 0.01).clamp(0.0, 1.0);
+    0.30 + 0.25 * (1.0 - normalized)
+}
+
+/// Kozeny-Carman equation: permeability from grain size and porosity.
+///
+/// k = d² × φ³ / (180 × (1-φ)²)
+///
+/// Ref: Kozeny (1927), Carman (1937).
+fn kozeny_carman(grain_size: f32, porosity: f32) -> f32 {
+    let d2 = grain_size * grain_size;
+    let phi3 = porosity * porosity * porosity;
+    let one_minus_phi = (1.0 - porosity).max(0.01);
+    d2 * phi3 / (180.0 * one_minus_phi * one_minus_phi)
+}
+
+/// Estimate contact angle from substance type.
+///
+/// Silicates (sand, soil): ~20° (hydrophilic)
+/// Metals: ~70°
+/// Organic matter: ~40-80°
+/// Polymers: ~80-100°
+fn estimate_contact_angle(sub: &Substance) -> f32 {
+    match sub {
+        Substance::Crystalline(c) => {
+            if c.base.is_metal() { 70.0 }
+            else { 25.0 } // silicates, ceramics
+        }
+        Substance::Amorphous { composition, .. } => {
+            // Organic content increases hydrophobicity
+            let c_frac: f32 = composition.iter()
+                .filter(|(e, _)| *e == Element::C)
+                .map(|(_, f)| f)
+                .sum();
+            20.0 + c_frac * 80.0 // 20° pure mineral, up to 100° for organic
+        }
+        Substance::Polymer(_) => 85.0, // most polymers are mildly hydrophobic
+        Substance::Molecular(_) => 30.0, // default for molecular solids
     }
 }

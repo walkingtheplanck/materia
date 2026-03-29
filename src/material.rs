@@ -166,9 +166,17 @@ impl Default for ChemicalProps {
 /// Fluid / moisture properties.
 #[derive(Debug, Clone)]
 pub struct HydraulicProps {
+    /// Volume fraction of void space (0.0-1.0). Max fluid absorption capacity.
     pub porosity: f32,
+    /// Darcy permeability (m²). How fast fluid flows through.
     pub permeability: f32,
+    /// Mean pore radius (m). Controls capillary pressure.
+    pub pore_radius: f32,
+    /// Contact angle (degrees). 0=hydrophilic, 90=neutral, 180=hydrophobic.
+    pub contact_angle: f32,
+    /// How much saturation raises ignition point.
     pub saturation_ignition_modifier: f32,
+    /// How much saturation changes thermal conductivity.
     pub saturation_conductivity_modifier: f32,
 }
 
@@ -177,6 +185,8 @@ impl Default for HydraulicProps {
         Self {
             porosity: 0.0,
             permeability: 0.0,
+            pore_radius: 0.0,
+            contact_angle: 60.0,
             saturation_ignition_modifier: 0.0,
             saturation_conductivity_modifier: 0.0,
         }
